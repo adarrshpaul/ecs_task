@@ -1,0 +1,22 @@
+{
+  "serverlessConsole.services": [
+    {
+      "type": "custom",
+      "title": "xray_func",
+      "timeOffsetInMs": 0,
+      "awsProfile": "default",
+      "items": [
+        {
+          "title": "/aws/lambda/xray_instrumented_function",
+          "tabs": [
+            {
+              "region": "ap-south-1",
+              "title": "dev",
+              "logs": "/aws/lambda/xray_instrumented_function"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
