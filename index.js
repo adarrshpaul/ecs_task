@@ -7,7 +7,6 @@ const router = require('./routes');
 const app = express();
 
 app.use(XRayExpress.openSegment('express'));
-// app.use((req, res, next) => { AWSXRay.getLogger().info(req.headers['x-amzn-trace-id'], AWSXRay.getSegment().trace_id); next(); })
 
 app.use('/', router);
 

@@ -64,6 +64,7 @@ router.get('/weather_api/',
         headers: {},
       };
       logger.info('query.location', location);
+
       try {
         const response = await axios(options);
         const weatherData = response.data;
