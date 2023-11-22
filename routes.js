@@ -4,7 +4,7 @@ const AWSXRay = require('aws-xray-sdk');
 const { axios } = require('./httpclient');
 const { param, body, query } = require('express-validator');
 const validate = require('./middleware/validation');
-const { xrayMiddleware, logger } = require('./observability_stack/logger');
+const { logger } = require('./observability_stack/logger');
 
 router.post('/weather-data/',
   [body('name').isString().withMessage('locationKey is required'),
@@ -42,7 +42,6 @@ router.post('/weather-data/',
   });
 
 router.get('/weather_api/',
-  xrayMiddleware,
   [query('location').notEmpty().withMessage('Enter a valid location name !')], validate,
   /**
    * 
