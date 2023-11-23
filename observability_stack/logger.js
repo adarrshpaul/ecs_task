@@ -7,7 +7,6 @@ const logger = winston.createLogger({
     new winston.transports.Console(),
   ],
 });
-AWSXRay.setLogger(winston);
 //Added code to add winston as the logger for AWS-Xray
 // Function to add X-Ray trace information to logs
 const addXRayTraceInfo = () => {
@@ -29,6 +28,6 @@ const enableLogTraceCorrelation = (req, res, next) => {
 
 const tracedLogger = AWSXRay.getLogger();
 module.exports = {
-  tracedLogger,
+  logger,
   enableLogTraceCorrelation
 }

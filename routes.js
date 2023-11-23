@@ -4,7 +4,7 @@ const AWSXRay = require('aws-xray-sdk');
 const { axios } = require('./httpclient');
 const { param, body, query } = require('express-validator');
 const validate = require('./middleware/validation');
-const { tracedLogger } = require('./observability_stack/logger');
+const { logger } = require('./observability_stack/logger');
 
 router.post('/weather-data/',
   [body('name').isString().withMessage('locationKey is required'),
@@ -29,10 +29,10 @@ router.post('/weather-data/',
 
       try {
         await dynamoDBClient.send(putItemCommand);
-        tracedLogger.info('Successfully stored weather data for city:', city);
+        logger.info('Successfully stored weather data for city:', city);
         res.send();
       } catch (error) {
-        tracedLogger.error('Error storing weather data:', error);
+        logger.error('Error storing weather data:', error);
         res.status(500).send('Error storing weather data');
       }
 
@@ -50,7 +50,7 @@ let doAPICall2 = async () => {
       'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com'
     }
   };
-  tracedLogger.debug(testOptions);
+  logger.debug(testOptions);
   await axios(testOptions);
 }
 
@@ -63,9 +63,9 @@ let doAPICall1 = async (location, weatherSegment) => {
     headers: {},
   };
   const response = await axios(options);
-  tracedLogger.info('iit');
+  logger.info('iit');
   const weatherData = response.data;
-  tracedLogger.debug(weatherData);
+  logger.debug(weatherData);
   const geoSubSegment = weatherSegment.addNewSubsegment('geo_api_call');
   await doAPICall2();
   geoSubSegment.close();
@@ -86,13 +86,13 @@ router.get('/weather_api/',
   async (req, res, next) => {
     try {
       const { location } = req.query;
-      tracedLogger.warn(req.query);
+      logger.warn(req.query);
       const weatherSegment = AWSXRay.getSegment().addNewSubsegment('weather_api');
       let weatherData = await doAPICall1(location, weatherSegment);
       weatherSegment.close();
       res.json(weatherData);
     } catch (err) {
-      tracedLogger.error(err);
+      logger.error(err);
       next(err);
     }
   });

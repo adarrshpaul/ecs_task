@@ -2,8 +2,8 @@
 const AWSXRay = require('aws-xray-sdk');
 const XRayExpress = AWSXRay.express;
 AWSXRay.captureAWS(require('aws-sdk'));
-const { tracedLogger, enableLogTraceCorrelation } = require('./observability_stack/logger');
-
+const { logger, enableLogTraceCorrelation } = require('./observability_stack/logger');
+AWSXRay.setLogger(logger);
 const express = require('express');
 const router = require('./routes');
 
@@ -21,10 +21,11 @@ app.get('/', (req, res) => {
 app.use(XRayExpress.closeSegment());
 
 app.use((err, req, res, next) => {
+  AWSXRay.getLogger().error(err);
   // Check if the error is an Express validation error
   res.status(500).json({ error: 'Something went wrong!' });
 });
 
 app.listen(80, () => {
-  tracedLogger.info('Microservice listening on port 80');
+  logger.info('Microservice listening on port 80');
 });
