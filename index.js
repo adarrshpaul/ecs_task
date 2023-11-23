@@ -1,12 +1,16 @@
+
 const AWSXRay = require('aws-xray-sdk');
 const XRayExpress = AWSXRay.express;
 AWSXRay.captureAWS(require('aws-sdk'));
+const { tracedLogger, enableLogTraceCorrelation } = require('./observability_stack/logger');
 
 const express = require('express');
 const router = require('./routes');
+
 const app = express();
 
 app.use(XRayExpress.openSegment('express'));
+// app.use(enableLogTraceCorrelation);
 
 app.use('/', router);
 
@@ -22,5 +26,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(80, () => {
-  console.log('Microservice listening on port 80');
+  tracedLogger.info('Microservice listening on port 80');
 });

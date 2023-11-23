@@ -4,7 +4,7 @@ const AWSXRay = require('aws-xray-sdk');
 const { axios } = require('./httpclient');
 const { param, body, query } = require('express-validator');
 const validate = require('./middleware/validation');
-const { logger } = require('./observability_stack/logger');
+const { tracedLogger } = require('./observability_stack/logger');
 
 router.post('/weather-data/',
   [body('name').isString().withMessage('locationKey is required'),
@@ -29,10 +29,10 @@ router.post('/weather-data/',
 
       try {
         await dynamoDBClient.send(putItemCommand);
-        console.log('Successfully stored weather data for city:', city);
+        tracedLogger.info('Successfully stored weather data for city:', city);
         res.send();
       } catch (error) {
-        console.error('Error storing weather data:', error);
+        tracedLogger.error('Error storing weather data:', error);
         res.status(500).send('Error storing weather data');
       }
 
@@ -40,6 +40,40 @@ router.post('/weather-data/',
       next(err);
     }
   });
+
+let doAPICall2 = async () => {
+  const testOptions = {
+    method: 'GET',
+    url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/adminDivisions',
+    headers: {
+      'X-RapidAPI-Key': 'ec52c6496dmsh6229b267eb0ec41p1ba2f5jsndb80a8ee1ae9',
+      'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com'
+    }
+  };
+  tracedLogger.debug(testOptions);
+  await axios(testOptions);
+}
+
+let doAPICall1 = async (location, weatherSegment) => {
+  const weatherstackURL = `http://api.weatherstack.com/current?access_key=3f0bb8b1e37bae8106f4f0a5f6bbffb7&query=${location}`;
+  const options = {
+    method: 'get',
+    maxBodyLength: Infinity,
+    url: weatherstackURL,
+    headers: {},
+  };
+  const response = await axios(options);
+  tracedLogger.info('iit');
+  const weatherData = response.data;
+  tracedLogger.debug(weatherData);
+  const geoSubSegment = weatherSegment.addNewSubsegment('geo_api_call');
+  await doAPICall2();
+  geoSubSegment.close();
+  return weatherData;
+
+}
+
+
 
 router.get('/weather_api/',
   [query('location').notEmpty().withMessage('Enter a valid location name !')], validate,
@@ -51,29 +85,14 @@ router.get('/weather_api/',
    */
   async (req, res, next) => {
     try {
-      const { query } = req;
-      const { location } = query;
-
-      const weatherstackURL = `http://api.weatherstack.com/current?access_key=3f0bb8b1e37bae8106f4f0a5f6bbffb7&query=${location}`;
-
-      const options = {
-        method: 'get',
-        maxBodyLength: Infinity,
-        url: weatherstackURL,
-        headers: {},
-      };
-      logger.info('query.location', location);
-
-      try {
-        const response = await axios(options);
-        const weatherData = response.data;
-        res.json(weatherData);
-      } catch (error) {
-        console.error(error);
-        res.status(500).send('Error fetching weather data');
-      }
-
+      const { location } = req.query;
+      tracedLogger.warn(req.query);
+      const weatherSegment = AWSXRay.getSegment().addNewSubsegment('weather_api');
+      let weatherData = await doAPICall1(location, weatherSegment);
+      weatherSegment.close();
+      res.json(weatherData);
     } catch (err) {
+      tracedLogger.error(err);
       next(err);
     }
   });

@@ -1,9 +1,10 @@
 const { validationResult } = require('express-validator');
+const { logger } = require('../observability_stack/logger');
 
 const validate = (req, res, next) => {
-  console.log(req.query, req.param);
+  logger.info(req.query, req.param);
   const errors = validationResult(req);
-  console.log(errors);
+  logger.info(errors);
   if (!errors.isEmpty()) {
     return res.status(400).json({
 

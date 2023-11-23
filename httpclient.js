@@ -5,7 +5,7 @@
 var AWSXRay = require('aws-xray-sdk');
 AWSXRay.captureHTTPsGlobal(require('http'));
 AWSXRay.captureHTTPsGlobal(require('https'));
-AWSXRay.captureHTTPsGlobal(require('axios'));
+AWSXRay.capturePromise();
 
 const axios = require('axios');
 module.exports = {
