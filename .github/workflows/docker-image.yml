@@ -21,6 +21,6 @@ jobs:
     - name: Build the Docker image
       run: | 
         docker build . --file Dockerfile --tag iluvyou3000/xray_instrumented_app:$(date +%s)
-        docker login -u DOCKER_USERNAME -p DOCKER_PASSWORD registry-index.docker.io
-        docker push registry-index.docker.io/iluvyou3000/xray_instrumented_app:${{ github.run_id }}
+        docker login -u DOCKER_USERNAME -p DOCKER_PASSWORD 
+        docker push iluvyou3000/xray_instrumented_app:${{ github.run_id }}
 
