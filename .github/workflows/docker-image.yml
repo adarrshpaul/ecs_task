@@ -12,6 +12,10 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      DOCKER_USERNAME: YOUR_DOCKERHUB_USERNAME
+      DOCKER_PASSWORD: ${{ secrets.YOUR_DOCKERHUB_TOKEN }}
+
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
