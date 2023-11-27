@@ -15,4 +15,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      run: | 
+        docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+        docker login -u YOUR_DOCKERHUB_USERNAME -p ${{ secrets.YOUR_DOCKERHUB_TOKEN }} registry-index.docker.io
+        docker push registry-index.docker.io/my-image-name:${{ github.run_id }}
+
