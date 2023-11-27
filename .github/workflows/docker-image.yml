@@ -5,23 +5,53 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
 jobs:
-
-  build:
-
+  build-and-deploy:
     runs-on: ubuntu-latest
 
-    env:
-      ENVIRONMENT: ${{ github.environment }}
-      DOCKER_USERNAME: ${{ vars.YOUR_DOCKERHUB_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.YOUR_DOCKERHUB_TOKEN }}
-
     steps:
-    - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: | 
-        docker build . --file Dockerfile --tag iluvyou3000/xray_instrumented_app:$(date +%s)
-        docker login -u DOCKER_USERNAME -p DOCKER_PASSWORD 
-        docker push iluvyou3000/xray_instrumented_app:${{ github.run_id }}
+      - name: Checkout code
+        uses: actions/checkout@v2
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Setup Docker Environment
+        id: setup-docker
+        shell: bash
+        run: |
+          export DOCKER_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+          export DOCKER_PASSWORD=${{ secrets.DOCKERHUB_PASSWORD }}
+          echo "Setting up Docker environment..."
+          sudo apt-get update && sudo apt-get install -y ca-certificates curl gnupg lsb-release
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+          echo "\ndeb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+          sudo apt-get update
+          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+          sudo systemctl start docker
+          sudo systemctl enable docker
+
+      - name: Build Docker Image
+        shell: bash
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+        run: |
+          docker build . --file Dockerfile --tag ${{ secrets.DOCKERHUB_USERNAME }}/xray_instrumented_app:${{ datetime.datetime.now(tz=timezone.utc).strftime('%Y%m%dT%H%M%S') }}
+
+      - name: Login to Docker Hub
+        shell: bash
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+        run: |
+          docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Push Docker Image to Docker Hub
+        shell: bash
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/xray_instrumented_app:7008228961
