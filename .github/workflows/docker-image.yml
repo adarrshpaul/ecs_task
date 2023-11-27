@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
+      env_var: ${{ vars.ENV_CONTEXT_VAR }}
       DOCKER_USERNAME: ${{ vars.YOUR_DOCKERHUB_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.YOUR_DOCKERHUB_TOKEN }}
 
