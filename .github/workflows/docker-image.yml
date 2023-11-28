@@ -19,10 +19,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-      
+
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+            echo "$GITHUB_CONTEXT"\
+
       - name: Print API Key
         run: |
-          echo "DOCKERHUB_USERNAME: ${{ secrets.API_KEY }}"
+          echo "DOCKERHUB_USERNAME: ${{ toJson(secrets) }}"
       
       - name: Print DB Password
         run: |
