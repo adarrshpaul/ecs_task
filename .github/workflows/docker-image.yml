@@ -24,15 +24,15 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
-            echo "$GITHUB_CONTEXT"\
-
+            echo "$GITHUB_CONTEXT"
+            
       - name: Print API Key
         run: |
           echo "DOCKERHUB_USERNAME: ${{ toJson(secrets) }}"
       
-      - name: Print DB Password
+      - name: Dump Env Contest
         run: |
-          echo "DOCKERHUB_TOKEN: ${{ secrets }}
+          echo "DOCKERHUB_TOKEN: ${{ toJson(env) }}
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
