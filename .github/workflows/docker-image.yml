@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2 
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -33,7 +33,7 @@ jobs:
         id: version
         with:
           scheme: semver
-          increment: patch
+          increment: major
 
       - name: Build Docker Image
         shell: bash
