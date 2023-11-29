@@ -33,7 +33,6 @@ jobs:
       - name: Dump Env Contest
         run: |
           echo "ENV_CONTEXT: ${{ toJson(env) }}
-          echo "ENV_CONTEXT: ${{ environment }}
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
