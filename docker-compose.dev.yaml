@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  # Node.js application
+  node_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - xray_daemon
+    environment:
+      AWS_XRAY_DAEMON_ADDRESS: xray_daemon:2000
+
+  # AWS X-Ray Daemon
+  #https://repost.aws/questions/QUr6JJxyeLRUK5M4tadg944w/x-ray-in-ecs-get-instance-id-metadata-failed
+  xray_daemon:
+    image: amazon/aws-xray-daemon:3.x
+    ports:
+      - "2000:2000/udp"
+    environment:
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: AWS_ACCESS_KEY_ID
+      AWS_SECRET_ACCESS_KEY: AWS_SECRET_ACCESS_KEY
+      AWS_XRAY_DAEMON_MODE: testing # Replace with your AWS region
+
+# Add any additional configurations or volumes as needed
