@@ -2,17 +2,17 @@
 const AWSXRay = require('aws-xray-sdk');
 const XRayExpress = AWSXRay.express;
 AWSXRay.captureAWS(require('aws-sdk'));
-const { logger, enableLogTraceCorrelation } = require('./observability_stack/logger');
+const { logger, enableLogTraceCorrelation } = require('./observability/logger');
 AWSXRay.setLogger(logger);
 const express = require('express');
-const router = require('./routes');
+const weatherRoutes = require('./routes/weather_app');
 
 const app = express();
 
 app.use(XRayExpress.openSegment('express'));
-// app.use(enableLogTraceCorrelation);
+app.use(enableLogTraceCorrelation);
 
-app.use('/', router);
+app.use('/', weatherRoutes);
 
 app.get('/', (req, res) => {
   res.status(404).json({ 'message': 'Not Found' });

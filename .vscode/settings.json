@@ -18,5 +18,6 @@
         }
       ]
     }
-  ]
+  ],
+  "codeQL.createQuery.qlPackLocation": "s:\\Coding Career\\AWS CDK\\Docker App"
 }

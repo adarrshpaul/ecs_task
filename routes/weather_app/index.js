@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const AWSXRay = require('aws-xray-sdk');
-const { axios } = require('./httpclient');
+const { httpClient } = require('../../httpclient');
 const { param, body, query } = require('express-validator');
-const validate = require('./middleware/validation');
-const { logger } = require('./observability_stack/logger');
+const validate = require('../../middleware/validation');
+const { logger } = require('../../observability/logger');
 
 router.post('/weather-data/',
   [body('name').isString().withMessage('locationKey is required'),
@@ -42,35 +42,28 @@ router.post('/weather-data/',
   });
 
 let doAPICall2 = async () => {
-  const testOptions = {
-    method: 'GET',
-    url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/adminDivisions',
+  const httpOptions = {
     headers: {
       'X-RapidAPI-Key': 'ec52c6496dmsh6229b267eb0ec41p1ba2f5jsndb80a8ee1ae9',
       'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com'
     }
   };
-  logger.debug(testOptions);
-  await axios(testOptions);
+  await httpClient.get("https://wft-geo-db.p.rapidapi.com/v1/geo/adminDivisions", httpOptions);
 }
 
 let doAPICall1 = async (location, weatherSegment) => {
   const weatherstackURL = `http://api.weatherstack.com/current?access_key=3f0bb8b1e37bae8106f4f0a5f6bbffb7&query=${location}`;
   const options = {
-    method: 'get',
     maxBodyLength: Infinity,
-    url: weatherstackURL,
     headers: {},
   };
-  const response = await axios(options);
-  logger.info('iit');
+  const response = await httpClient.get(weatherstackURL, options);
   const weatherData = response.data;
-  logger.debug(weatherData);
+
   const geoSubSegment = weatherSegment.addNewSubsegment('geo_api_call');
   await doAPICall2();
   geoSubSegment.close();
   return weatherData;
-
 }
 
 

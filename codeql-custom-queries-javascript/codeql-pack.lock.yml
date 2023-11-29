@@ -1,0 +1,16 @@
+---
+lockVersion: 1.0.0
+dependencies:
+  codeql/javascript-all:
+    version: 0.8.3
+  codeql/mad:
+    version: 0.2.3
+  codeql/regex:
+    version: 0.2.3
+  codeql/tutorial:
+    version: 0.2.3
+  codeql/util:
+    version: 0.2.3
+  codeql/yaml:
+    version: 0.2.3
+compiled: false

@@ -19,7 +19,6 @@ const addXRayTraceInfo = () => {
   }
 };
 
-
 // Middleware to add X-Ray trace information to logs
 const enableLogTraceCorrelation = (req, res, next) => {
   addXRayTraceInfo();

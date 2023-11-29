@@ -1,5 +1,5 @@
 const { validationResult } = require('express-validator');
-const { logger } = require('../observability_stack/logger');
+const { logger } = require('../observability/logger');
 
 const validate = (req, res, next) => {
   logger.info(req.query, req.param);
