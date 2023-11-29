@@ -8,6 +8,9 @@ AWSXRay.captureHTTPsGlobal(require('https'));
 AWSXRay.capturePromise();
 
 const axios = require('axios');
+const instance = axios.create();
+const axiosRetry = require('axios-retry')
+axiosRetry(axios, { retryDelay: axiosRetry.exponentialDelay });
 module.exports = {
   axios
 }
