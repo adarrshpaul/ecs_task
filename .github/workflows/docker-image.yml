@@ -44,6 +44,7 @@ jobs:
         with:
           username: "$DOCKERHUB_USERNAME"
           password: "$DOCKERHUB_PASSWORD"
+          ecr: false
 
       - name: Build Docker Image
         shell: bash
