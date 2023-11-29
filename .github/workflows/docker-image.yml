@@ -28,7 +28,7 @@ jobs:
             
       - name: Dump Secret Context
         run: |
-          echo ${{ toJson(secrets) }}"
+          echo ${{ toJson(secrets) }}
       
       - name: Dump Env Contest
         run: |
