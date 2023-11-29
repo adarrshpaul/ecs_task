@@ -32,7 +32,7 @@ jobs:
         run: |
           echo "SECRET_CONTEXT"
       
-      - name: Dump Env Contest
+      - name: Dump Local Env Contest
         run: |
           echo "ENV_CONTEXT: ${{ toJson(env) }}"
 
