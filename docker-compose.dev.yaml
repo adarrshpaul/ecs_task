@@ -20,9 +20,23 @@ services:
     ports:
       - "2000:2000/udp"
     environment:
-      AWS_REGION: us-east-1
+      AWS_REGION: ap-south-1
       AWS_ACCESS_KEY_ID: AWS_ACCESS_KEY_ID
       AWS_SECRET_ACCESS_KEY: AWS_SECRET_ACCESS_KEY
       AWS_XRAY_DAEMON_MODE: testing # Replace with your AWS region
 
+networks:
+  custom_network: 
+    driver: bridge   
+
 # Add any additional configurations or volumes as needed
+#Some important debugging commands:
+#Get Ip address of the container_app: docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' node_app
+# docker exec {container_id} {command}
+# docker exec node_app ls
+
+#with user-defined bridge network you can also use the DNS in the docker container.
+#docker exec node_app curl xray_daemon
+
+#default bridge driver is not recommended for production use
+
