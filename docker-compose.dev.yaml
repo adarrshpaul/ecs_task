@@ -19,11 +19,8 @@ services:
     image: amazon/aws-xray-daemon:3.x
     ports:
       - "2000:2000/udp"
-    environment:
-      AWS_REGION: ap-south-1
-      AWS_ACCESS_KEY_ID: AWS_ACCESS_KEY_ID
-      AWS_SECRET_ACCESS_KEY: AWS_SECRET_ACCESS_KEY
-      AWS_XRAY_DAEMON_MODE: testing # Replace with your AWS region
+    env_file:
+      - variables.env
 
 networks:
   custom_network: 
