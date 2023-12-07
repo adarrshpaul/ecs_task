@@ -1,0 +1,135 @@
+// artillery-advanced-script.js
+
+const baseURL = "https://your-api-url";
+const randomLatency = Math.floor(Math.random() * 500) + 100;
+const randomFailuresPercentage = Math.floor(Math.random() * 10) + 1;
+
+exports.authenticatedUserScenarios = {
+  description: "Authenticated user performing common tasks.",
+  stages: [
+    {
+      id: "login",
+      description: "Login and obtain access token.",
+      target: `${baseURL}/auth/login`,
+      insert: [
+        { field: "username", value: "{email}" },
+        { field: "password", value: "{password}" }
+      ],
+      modes: {
+        constantRate: {
+          rate: 10, // Login rate per second
+          sustain: 60 // Sustain login rate for 60 seconds
+        }
+      }
+    },
+    {
+      id: "addItem",
+      description: "Add an item to the cart.",
+      target: `${baseURL}/cart`,
+      insert: [],
+      modes: {
+        fixedRate: {
+          rate: 1, // Add Item rate per second
+          sustain: 60 // Sustain add item rate for 60 seconds
+        }
+      }
+    },
+    {
+      id: "viewCart",
+      description: "View the cart contents.",
+      target: `${baseURL}/cart`,
+      insert: [],
+      modes: {
+        fixedRate: {
+          rate: 1, // View Cart rate per second
+          sustain: 60 // Sustain view cart rate for 60 seconds
+        }
+      }
+    },
+    {
+      id: "checkOut",
+      description: "Check out and purchase items.",
+      target: `${baseURL}/order`,
+      insert: [],
+      modes: {
+        ramp: {
+          rate: 1, // Check Out rate per second
+          sustain: 60, // Sustain check out rate for 60 seconds
+          warmUpDuration: 10, // Warm-up period of 10 seconds
+          minRPS: 0, // Minimum rate of 0
+          maxRPS: 10 // Maximum rate of 10
+        }
+      }
+    }
+  ],
+  generations: {
+    authenticatedUsers: {
+      count: 1000,
+      type: "users",
+      expression: {
+        email: {
+          type: "string",
+          expression: "{{randomEmail}}"
+        },
+        password: {
+          type: "string",
+          expression: "{{randomPassword}}"
+        }
+      }
+    }
+  }
+};
+
+exports.unauthenticatedUserScenarios = {
+  description: "Unauthenticated user attempting to access secured routes.",
+  stages: [
+    {
+      id: "invalidRouteAccess",
+      description: "Invalid route access attempt.",
+      target: `${baseURL}/secure/route`,
+      insert: []
+    }
+  ],
+  generations: {
+    unauthenticatedUsers: {
+      count: 100,
+      type: "users",
+      expression: {
+        email: {
+          type: "string",
+          expression: "{{randomEmail}}"
+        },
+        password: {
+          type: "string",
+          expression: "{{randomPassword}}"
+        }
+      }
+    }
+  }
+};
+
+exports.monitoringIntegration = {
+  description: "Send performance data to Datadog.",
+  stages: [
+    {
+      id: "datadogMetric",
+      description: "Send metric to Datadog.",
+      target: null,
+      modes: {
+        oncePerMinute: {
+          interval: 60000, // Send metric every 60 seconds
+          concurrency: 1, // Only one VU sends the metric
+          numRetries: 1, // Retry sending metric once if fails
+          delayBetweenRetry: 5000 // Wait 5 seconds between retries
+        }
+      }
+    }
+  ],
+  generations: {
+    monitoringVUs: {
+      count: 1,
+      type: "vus",
+      expression: {}
+    }
+  }
+};

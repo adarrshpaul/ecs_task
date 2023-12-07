@@ -7,10 +7,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "cross-env NODE_ENV=development node index.js",
     "prod": "cross-env NODE_ENV=production node index.js",
-    "docker-dev": "docker-compose -f docker-compose.dev.yaml up"
+    "docker-dev": "docker-compose -f docker-compose.dev.yaml up",
+    "test:performance:dev": "npx artillery run -e production performance-test/test.yaml"
   },
   "keywords": [],
-  "author": "",
+  "author": "adarrsh_paul",
   "license": "ISC",
   "dependencies": {
     "@aws-sdk/client-cloudwatch-logs": "^3.451.0",
@@ -25,6 +26,7 @@
     "winston": "^3.11.0"
   },
   "devDependencies": {
+    "artillery": "^2.0.2",
     "cross-env": "^7.0.3"
   }
 }
